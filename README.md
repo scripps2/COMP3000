@@ -1,13 +1,19 @@
-# COMP3000 Dissertation
+# Tabletop RPG Combat Companion App
+**Supervisor:** Joseph Ross
 
-## Main Ideas:
+### Vision  
+Designed for unconfident or new players for Tabletop RPGs who want to create and run their own campaigns and events, but struggle with handling their combat encounters and keeping it engaging for their players. 
 
-### Tabletop RPG Combat Companion App
-An app to be used by the Dungeon Master (DM), main focus being to generate additional flavour for encounters in order to make combat feel more engaging. Randomly assigns traits or attributes to NPCs in encounters, and provide basic prompts for the DM to use based on the 
+The Tabletop RPG Combat Companion is a web app that will provide a simple way for the user to dynamically alter a combat encounter, improving the experience for everyone involved in the game. The app will use a system of behaviours or traits for Non-Player Characters (NPCs) that are randomly assigned when the user creates an encounter, which will change the way the NPCs approach encounters and respond to player actions. With the traits being randomly assigned, multiple encounters of the same base can feel entirely different to each other and will help the user keep everyone engaged. 
+The DM’s flavour in a campaign is very important to the overall experience however, so the app is intended to be used to compliment the DM of a campaign and not replace. The responses from the app will be more ambiguous to allow the user to still add their own flavour to the actions taken without the experience feeling overly rigid, which will also allow the suggestions to be more flexible with their application.   
 
-The app is aimed towards novice/unconfident DMs, and should be designed in a simple way to allow the DM to easily check details and edit values swiftly in response to game actions. The app can still be used without the trait system in order to help streamline the game, if the DM would prefer based on the encounter.  
+The app will also be designed to be still usable without utilising the dynamic traits, providing a clear and responsive UI to clearly display information about the encounter, and allow the user to easily edit data in the middle of the encounter, such as changes in health or available resources. 
+
  
-### Time/Routine Management App
+# Time/Routine Management App
+**Supervisor:** Joseph Ross  
+
+### Vision  
 An app to provide help with time management and staying on track of upcoming commitments. It will provides easy event creation, and allows user-created "procedures" that can be assigned to new events upon creation. "Procedures" can allow the user to specify a sequence of reminders, alarms, or other features that can happen prior to the event, possibly requiring user input to ensure something is done if desired.
 For example: 
  - Night before at "10:00PM": Push Notification - "Go to Bed"
