@@ -36,10 +36,10 @@ A button will bring up the ActionResolve menu to allow quickly performing an act
     </div>
 
     <div class="playercardbuttons">
-      <button @click="playerToggle"> {{ buttonText }} </button> 
+      <button @click="playerHide"> {{ buttonText }} </button> 
       <button @click="playerFullHp"> MaxHP </button>
       <button @click="playerZeroHp"> 0HP </button>
-      <button> test2 </button>
+      <button @click="playerRemove"> Delete </button>
     </div>
 
   </div>
@@ -49,7 +49,7 @@ A button will bring up the ActionResolve menu to allow quickly performing an act
 
 export default {
     props: ['id', 'name', 'maxhp', 'health','initative', 'display', 'viewHidden', 'stats'],
-    emits: ['playerClicked', 'playerToggle', 'playerHealth'],
+    emits: ['entityClicked', 'entityHide', 'entityEditHealth', 'entityRemove'],
     data() {
       return {
         deathsavesSuccess: 0,
@@ -71,21 +71,25 @@ export default {
     methods: {
 
       playerClick() {
-        this.$emit('playerClicked', this.id)
+        this.$emit('entityClicked', 'player', this.id)
       },
 
-      playerToggle() {
-        this.$emit('playerToggle', this.id)
+      playerHide() {
+        this.$emit('entityHide', 'player', this.id)
         if(this.buttonText == 'Hide') this.buttonText = 'Show';
         else this.buttonText = 'Hide'
       },
 
       playerFullHp() {
-        this.$emit('playerHealth', 'player', this.id, this.maxhp)
+        this.$emit('entityEditHealth', 'player', this.id, this.maxhp)
       },
 
       playerZeroHp() {
-        this.$emit('playerHealth', 'player', this.id, 0)
+        this.$emit('entityEditHealth', 'player', this.id, 0)
+      },
+
+      playerRemove() {
+        this.$emit('entityRemove', 'player', this.id)
       },
 
       passDeathSave() {

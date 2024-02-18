@@ -28,23 +28,25 @@ A button will bring up the ActionResolve menu to allow quickly performing an act
 
 <script>
 export default {
-    props: ['id', 'name', 'health','initative'],
-    data() {
-        return {
-            status: 'alive'
-        }
-    },
-    updated() {
-        if(this.health <= 0) {
-            this.status = 'dead'
-        }
-        if(this.health > 0) {
-            this.status = 'alive'
-        }
-    },
-    methods: {
-      npcClick() {
-        this.$emit('detailsNpc', this.id)
+  name: 'NpcCard',
+  props: ['id', 'name', 'health','initative'],
+  emits: ['entityClicked'],
+  data() {
+      return {
+          status: 'alive'
+      }
+  },
+  updated() {
+      if(this.health <= 0) {
+          this.status = 'dead'
+      }
+      if(this.health > 0) {
+          this.status = 'alive'
+      }
+  },
+  methods: {
+    npcClick() {
+      this.$emit('entityClicked', 'npc', this.id)
     }
   }
 }

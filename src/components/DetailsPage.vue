@@ -3,10 +3,17 @@
 Deciding between having information with tabs or a scrollable area with sections.-->
 
 <template>
-    <div class="detailsname" :class="{ isplayer: player === 'player' }">
+    <div class="detailsname" :class="{ isplayer: entityType === 'player' }">
         {{ entity.name }}
     </div>
-    <div class="detailsmain">
+    <div class="detailsnavigation">
+        <button @click="detailsChangeTab('main')"> Main </button> 
+        <button @click="detailsChangeTab('stats')"> Stats </button>
+        <button @click="detailsChangeTab('attacks')"> Attacks </button>
+        <button @click="detailsChangeTab('spells')"> Spells </button>
+    </div>
+    <div class="detailscontent">
+        <div v-if="currenttab === 'main'" class="detailsmain">
         <div class="detailshealth">
             <b> Health: {{ entity.health }} </b>
             <div class="detailshealthinput">
@@ -17,32 +24,52 @@ Deciding between having information with tabs or a scrollable area with sections
             Initative: {{ entity.initative }}
         </div>
         
-    </div>
-    <div class="stats">
+        </div>
+        <div v-if="currenttab === 'stats'" class="stats">
         <br> 
-        Strength: {{ entity.stats[0] }} - Bonus: {{ Math.floor((entity.stats[0]-10)/2) }}  <br>
-        Dexterity: {{ entity.stats[1] }} - Bonus: {{ Math.floor((entity.stats[1]-10)/2) }}  <br> 
-        Constitution: {{ entity.stats[2] }} - Bonus: {{ Math.floor((entity.stats[2]-10)/2) }} <br>
-        Intelligence: {{ entity.stats[3] }} - Bonus: {{ Math.floor((entity.stats[3]-10)/2) }} <br> 
-        Wisdom: {{ entity.stats[4] }} - Bonus: {{ Math.floor((entity.stats[4]-10)/2) }} <br> 
-        Charisma: {{ entity.stats[5] }} - Bonus: {{ Math.floor((entity.stats[5]-10)/2) }} <br> 
+        Strength: {{ entity.stats.strength }} - Bonus: {{ Math.floor(( entity.stats.strength - 10)/2) }}  <br>
+        Dexterity: {{ entity.stats.dexterity }} - Bonus: {{ Math.floor(( entity.stats.dexterity - 10)/2) }}  <br> 
+        Constitution: {{ entity.stats.constitution }} - Bonus: {{ Math.floor(( entity.stats.constitution - 10)/2) }} <br>
+        Intelligence: {{ entity.stats.intelligence }} - Bonus: {{ Math.floor(( entity.stats.intelligence - 10)/2) }} <br> 
+        Wisdom: {{ entity.stats.wisdom }} - Bonus: {{ Math.floor(( entity.stats.wisdom - 10)/2) }} <br> 
+        Charisma: {{ entity.stats.charisma }} - Bonus: {{ Math.floor(( entity.stats.charisma - 10)/2) }} <br> 
+        </div>
+        <div v-if="currenttab === 'attacks'" class="attacks">
+            <!-- Some sort of table system here -->
+            Name of Attack - To-Hit Modifier - Damage - Extra details
+            <br>
+            Unarmed attack  To-hit: {{ Math.floor((entity.stats.strength-10)/2) +2 }} - Damage: {{ 1 + Math.floor((entity.stats.strength-10)/2)}}
+        </div>
+        <div v-if="currenttab === 'spells'" class="spells">
+            <!-- Some sort of table system here -->
+            Name of Spell - To-Hit or Save to roll - Damage - Extra Details
+            <br>
+            <!-- To hit can change between classes.  Maybe each character carries a "class" object that includes
+                their class name and level as well as information like their spellcasting ability, spell slots, etc -->
+            Fire Bolt - To-hit: {{ Math.floor((entity.stats.intelligence-10)/2) + 2 }} - Damage: 1d8 Fire - 120ft Range
+        </div> 
     </div>
 </template>
 
 <script>
 export default {
-    props: ["entity", "player"],
-    emits: ["HealthChange"],
+    props: ["entity", "entityType"],
+    emits: ["entityEditHealth"],
     data() {
         return {
-            healthinput: null
+            healthinput: null,
+            currenttab: 'main',
         }
     },
     methods: {
         healthChange(mult) {
             var newHealth = this.entity.health + Math.floor(this.healthinput) * mult;
-            this.$emit('HealthChange',this.player, this.entity.id, newHealth)
+            this.$emit('entityEditHealth', this.entityType, this.entity.id, newHealth)
             console.log(newHealth)
+        },
+
+        detailsChangeTab(tabInput) {
+            this.currenttab = tabInput;
         }
     }
 }
@@ -65,6 +92,15 @@ export default {
         color:darkgreen;
     }
 
+    .detailsnavigation {
+        width: 100%;
+        border-bottom-style: solid;
+    }
+
+    .detailscontent {
+        width: 100%;
+        /*padding-top: 10px; - Want to have a margin before but have the border go all the way up */
+    }
     .detailsmain {
         display: flex;
         overflow: hidden;
