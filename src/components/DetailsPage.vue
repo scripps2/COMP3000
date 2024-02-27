@@ -1,6 +1,5 @@
 <!-- DetailsPage sits in the center of the page and will be used to display the information
-    of the most recently clicked player or NPC.
-Deciding between having information with tabs or a scrollable area with sections.-->
+    of the most recently clicked player or NPC. -->
 
 <template>
     <div class="detailsname" :class="{ isplayer: entityType === 'player' }">
@@ -15,7 +14,7 @@ Deciding between having information with tabs or a scrollable area with sections
     <div class="detailscontent">
         <div v-if="currenttab === 'main'" class="detailsmain">
         <div class="detailshealth">
-            <b> Health: {{ entity.health }} </b>
+            <b> Health: {{ entity.health }}/{{ entity.maxhp }} </b>
             <div class="detailshealthinput">
                 <button @click="healthChange(-1)">-</button><input type="number" step="1" v-model="healthinput" placeholder='Enter value'><button @click="healthChange(1)">+</button>
             </div>
@@ -53,7 +52,7 @@ Deciding between having information with tabs or a scrollable area with sections
 
 <script>
 export default {
-    props: ["entity", "entityType"],
+    props: ["entityIndex", "entity", "entityType"],
     emits: ["entityEditHealth"],
     data() {
         return {
@@ -64,8 +63,7 @@ export default {
     methods: {
         healthChange(mult) {
             var newHealth = this.entity.health + Math.floor(this.healthinput) * mult;
-            this.$emit('entityEditHealth', this.entityType, this.entity.id, newHealth)
-            console.log(newHealth)
+            this.$emit('entityEditHealth', this.entityType, this.entityIndex, newHealth)
         },
 
         detailsChangeTab(tabInput) {

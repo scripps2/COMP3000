@@ -5,11 +5,12 @@
   </div>
   <div class="modalDisplay" v-if="displayModal === true">
     <EntityModal v-if="modalType === 'addEntity'"
+    :entityToAdd="entityToAdd"
     @HideModal="HideModal"
-    @AddPlayer="AddPlayer" />
+    @AddEntity="AddEntity" />
 
     <EntityDeleteModal v-if="modalType === 'removeEntity'" 
-    :entity="entity"
+    :entity="selectedEntity"
     @HideModal="HideModal"
     @ConfirmRemove="ConfirmRemove"/>
   </div>
@@ -19,19 +20,16 @@
         Player List <br>
         <button @click="AddEntityRand('player')">Add Random</button> 
         <button @click="ShowEntityModal('player')">Add Modal</button>
-        <button @click="ToggleHiddenView()">{{ hiddenText }}</button>
+        <button @click="ToggleHiddenView('players')">{{ hiddenButton.players }}</button>
       </div>
       <div class="leftcontent">
         <PlayerCard 
-          v-for="player in players"
-          :key="player.id"
-          :id="player.id"
-          :name="player.name"
-          :maxhp="player.maxhp"
+          v-for="(player,index) in sorted_players"
+          :key="player.name"
+          :index=index
+          :entity="player"
           :health="player.health"
-          :initative="player.initative"
-          :display ="player.display"
-          :viewHidden="this.viewHidden"
+          :viewHidden="this.viewHidden.players"
           @entityClicked="entityClicked"
           @entityHide="entityHide"
           @entityEditHealth="entityEditHealth"
@@ -44,7 +42,11 @@
         Entity Details
       </div>
       <div class="middlecontent">
-        <DetailsPage v-if="showInfo" :entity="entity" :entityType="entityType" @entityEditHealth="entityEditHealth"/>
+        <DetailsPage v-if="showInfo"
+          :entityIndex="selectedEntityIndex" 
+          :entity="selectedEntity" 
+          :entityType="selectedEntityType" 
+          @entityEditHealth="entityEditHealth"/>
         <div v-if="!showInfo">
           <br>
           Click a player or NPC to be able to <br>
@@ -54,18 +56,23 @@
     </div>
     <div class="right">
       <div class="rightheader">
-        Enemy List <button @click="AddEntityRand('npc')">Add</button>
+        Enemy List <br> 
+        <button @click="AddEntityRand('npc')">Add Random</button> 
+        <button @click="ShowEntityModal('npc')">Add Modal</button>
+        <button @click="ToggleHiddenView('npcs')">{{ hiddenButton.npcs }}</button>
       </div>
       <div class="rightcontent">
         <NpcCard 
-          v-for="npc in npcs"
-          :key="npc.id"
-          :id="npc.id"
-          :name="npc.name"
+          v-for="(npc,index) in sorted_npcs"
+          :key="npc.name"
+          :index=index
+          :entity="npc"
           :health="npc.health"
-          :initative="npc.initative"
+          :viewHidden="this.viewHidden.npcs"
           @entityClicked="entityClicked"
           @entityHide="entityHide"
+          @entityEditHealth="entityEditHealth"
+          @entityRemove="entityRemove"
         />    
       </div>
     </div>
@@ -88,14 +95,16 @@ export default {
       players: this.GetPlayers(),
       showInfo: false,
       npcs: this.GetNPCs(),
-      entity: null,
-      entityType: null,
-      playerTotal: null,
-      npcTotal: null,
+      deleteIndex: null,
+      /* Condense selectedEntity into a single array */
+      selectedEntityIndex: null,
+      selectedEntity: null,
+      selectedEntityType: null,
       displayModal: false,
       modalType: '',
-      viewHidden: false,
-      hiddenText: 'Show Hidden'
+      viewHidden: {players: false, npcs: false},
+      hiddenButton: {players: 'Show Hidden', npcs: 'Show Hidden'},
+      entityToAdd: '',
     }
   },
   mounted() { 
@@ -106,17 +115,19 @@ export default {
   },
 
   methods: {
-    entityClicked(targetType, targetID) {
+    entityClicked(targetType, targetidx) {
       // Player card has been clicked, displaying their details.
       if (targetType === 'player') {
-      this.entity = this.players[targetID]
-      this.entityType = "player"
-      this.showInfo = true
+        this.selectedEntity = this.players[targetidx];
+        this.selectedEntityType = "player";
+        this.showInfo = true;
+        this.selectedEntityIndex = targetidx;
       }
       else if (targetType === 'npc') {
-        this.entity = this.npcs[targetID]
-        this.entityType = 'npc'
-        this.showInfo = true
+        this.selectedEntity = this.npcs[targetidx];
+        this.selectedEntityType = 'npc';
+        this.showInfo = true;
+        this.selectedEntityIndex = targetidx;
       }
       else console.log('Incorrect targetType given. Given targetType: ' + targetType);
     },
@@ -126,9 +137,9 @@ export default {
       var playerlist;
       if(input === undefined) {
         playerlist = [
-          {id: 0, name: "Player 1", display: true, maxhp: 12, health: 12, initative: 8, stats:{ strength: 15, dexterity: 13, constitution: 14, intelligence: 8, wisdom: 10, charisma: 12}},
-          {id: 1, name: "2nd", display: true, maxhp: 8, health: 8, initative: 18, stats: { strength: 8, dexterity: 15, constitution: 10, intelligence: 12, wisdom: 13, charisma: 14}},
-          {id: 2, name: "Third", display: true, maxhp: 6, health: 6, initative: 12, stats: { strength: 8, dexterity: 12, constitution: 10, intelligence: 15, wisdom: 14, charisma: 13 }},
+          {name: "Player 1", display: true, maxhp: 12, health: 12, initative: 8, stats:{ strength: 15, dexterity: 13, constitution: 14, intelligence: 8, wisdom: 10, charisma: 12}},
+          {name: "2nd", display: true, maxhp: 8, health: 8, initative: 18, stats: { strength: 8, dexterity: 15, constitution: 10, intelligence: 12, wisdom: 13, charisma: 14}},
+          {name: "Third", display: true, maxhp: 6, health: 6, initative: 12, stats: { strength: 8, dexterity: 12, constitution: 10, intelligence: 15, wisdom: 14, charisma: 13 }},
         ]
       }
       else {
@@ -142,8 +153,8 @@ export default {
       var npclist;
       if(input === undefined) {
         npclist = [
-          {id: 0, name: "Goblin", maxhp: 6, health: 6, initative: 4, stats: [10,10,10,10,10,10]},
-          {id: 1, name: "Goblin #2", maxhp: 5, health: 5, initative: 9, stats: [10,10,10,10,10,10]}
+          {name: "Goblin", maxhp: 6, health: 6, initative: 4, display: true, stats: {strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma:10}},
+          {name: "Goblin #2", maxhp: 5, health: 5, initative: 9, display: true, stats: {strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma:10}}
         ]
       } else {
         npclist = input;
@@ -157,25 +168,20 @@ export default {
       var generatedHealth = Math.ceil(Math.random()*6+6); // Random value between 7 and 12
       var generatedInitative = Math.ceil(Math.random()*20); // Random value between 1 and 20
       var generatedEntity = {
-        id: 0,
         name: 'placeholder',
         maxhp: generatedHealth,
         health: generatedHealth,
         initative: generatedInitative,
-        stats: [10,10,10,10,10,10],
+        stats: {strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma:10},
         display: true,
       }
       if (targetType === 'player') {
-        generatedEntity.id = this.playerTotal;
-        generatedEntity.name = 'Player #' + (this.playerTotal+1);
+        generatedEntity.name = 'Player #' + (this.players.length+1);
         this.players.push(generatedEntity);
-        this.playerTotal++;
-      } else if (targetType === 'npc') 
-      {
-        generatedEntity.id = this.npcTotal;
-        generatedEntity.name = 'NPC #' + (this.npcTotal+1);
+      } 
+      else if (targetType === 'npc') {
+        generatedEntity.name = 'NPC #' + (this.npcs.length+1);
         this.npcs.push(generatedEntity);
-        this.npcTotal++;
       }
       else {
         console.log('Error generating entity. Given targetType: ' + targetType);
@@ -183,75 +189,93 @@ export default {
     },
 
     ShowEntityModal(targetType) {
+      this.entityToAdd = targetType;
       this.modalType = 'addEntity';
       this.displayModal = true;
     },
 
-    AddPlayer(playerInfo) {
-      var generatedPlayer = {
-        id: this.playerTotal,
-        name: playerInfo.name,
-        maxhp: playerInfo.health,
-        health: playerInfo.health,
-        initative: playerInfo.initative,
-        stats: [10,10,10,10,10,10],
+    AddEntity(entityType, entityInfo) {
+      var generatedEntity = {
+        name: entityInfo.name,
+        maxhp: entityInfo.health,
+        health: entityInfo.health,
+        initative: entityInfo.initative,
+        stats: {strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma:10},
         display: true
       }
-        this.players.push(generatedPlayer);
-        this.playerTotal++;
+        if (entityType === 'player') this.players.push(generatedEntity);
+        else if (entityType === 'npc') this.npcs.push(generatedEntity);
+        else console.log('Error adding entity. Given type: ' + entityType);
         this.displayModal = false;
+        this.entityToAdd = false;
     },
 
     HideModal() {
       this.displayModal = false;
       this.modalType = '';
+      this.deleteIndex = null;
     },
 
-    entityHide(targetType, targetid) {
-      if (targetType === 'player') this.players[targetid].display = !this.players[targetid].display;
-      else if (targetType === 'npc') this.npcs[targetid].display = !this.npcs[targetid].display;
+    entityHide(targetType, targetidx) {
+      if (targetType === 'player') this.players[targetidx].display = !this.players[targetidx].display;
+      else if (targetType === 'npc') this.npcs[targetidx].display = !this.npcs[targetidx].display;
       else console.log('Incorrect targetType given. Given targetType: ' + targetType);
     },
 
-    ToggleHiddenView() {
-      this.viewHidden = !this.viewHidden;
-      console.log(this.viewHidden);
-      if(this.viewHidden == true) this.hiddenText = 'Hide Hidden';
-        else this.hiddenText = 'Show Hidden'
+    ToggleHiddenView(entityType) {
+      if (entityType === 'players') { 
+        this.viewHidden.players = !this.viewHidden.players; 
+        if(this.viewHidden.players == true) this.hiddenButton.players = 'Hide Hidden';
+        else this.hiddenButton.players = 'Show Hidden' }
+
+      else if (entityType === 'npcs') {
+        this.viewHidden.npcs = !this.viewHidden.npcs;
+        if(this.viewHidden.npcs == true) this.hiddenButton.npcs = 'Hide Hidden';
+        else this.hiddenButton.npcs = 'Show Hidden' }
     },
 
-    entityEditHealth(targetType, targetID, newHealth) {
+    entityEditHealth(targetType, targetidx, newHealth) {
       // Updating an entity's health value to a new amount, automatically ensuring it doesn't go over or under limits.
       if(targetType === "player") {
-        this.players[targetID].health = Math.max(Math.min(newHealth,this.players[targetID].maxhp),0);
+        this.players[targetidx].health = Math.max(Math.min(newHealth,this.players[targetidx].maxhp),0);
       } else if(targetType === "npc") {
-        this.npcs[targetID].health = Math.max(Math.min(newHealth,this.npcs[targetID].maxhp),0);
+        this.npcs[targetidx].health = Math.max(Math.min(newHealth,this.npcs[targetidx].maxhp),0);
       }
       else {
         console.log("HealthChange did not specify player or npc");
       }
     },
 
-    entityRemove(targetType, targetid) {
-
-      if (targetType === 'player') { this.entity = this.players[targetid]; this.entityType = 'player'; this.displayModal = true; this.modalType = 'removeEntity'; }
-      else if (targetType === 'npc') { this.entity = this.npcs[targetid]; this.entityType = 'npc'; this.displayModal = true; this.modalType = 'removeEntity'; }
+    entityRemove(targetType, targetidx) {
+      this.deleteIndex = targetidx;
+      if (targetType === 'player') { this.selectedEntity = this.players[targetidx]; this.entityType = 'player'; this.displayModal = true; this.modalType = 'removeEntity'; }
+      else if (targetType === 'npc') { this.selectedEntity = this.npcs[targetidx]; this.entityType = 'npc'; this.displayModal = true; this.modalType = 'removeEntity'; }
       else console.log('Invalid targetType given. Given targetType: ' + targetType );
     },
 
     ConfirmRemove() {
-      if (this.entityType === 'player') this.players.splice(this.entity.id, 1);
-      else if (this.entityType === 'npc') this.npcs.splice(this.entity.id, 1);
+      if (this.entityType === 'player') this.players.splice(this.deleteIndex, 1);
+      else if (this.entityType === 'npc') this.npcs.splice(this.deleteIndex, 1);
       else console.log('ConfirmRemove unsuccessful')
+      this.deleteIndex = null;
       this.showInfo = false;
-      this.entity = null;
-      this.entityType = null;
+      this.selectedEntity = null;
+      this.selectedEntityType = null;
       this.hideModal = true;
       this.modalType = '';
-    }
-
+    },
 
   },
+
+  computed: {
+    sorted_players() {
+      return this.players.sort((a,b) => {return b.initative - a.initative;});
+    },
+
+    sorted_npcs() {
+      return this.npcs.sort((a,b) => {return b.initative - a.initative;});
+    }
+  }
 }
 </script>
 

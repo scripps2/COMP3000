@@ -21,7 +21,7 @@ body {
     font-weight: bold;
   }
 
-  .leftheader {
+  .leftheader, .rightheader {
     height: 10% /* This is to allow easy displaying of the buttons before a better UI system is setup */
   }
 

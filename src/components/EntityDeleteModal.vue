@@ -16,7 +16,7 @@
 <script>
 export default {
     name: 'EntityDeleteModal',
-    props: ['entity', 'entityType'],
+    props: ['entity', 'entityType', 'index'],
     data() {
         return {
 

@@ -1,13 +1,14 @@
 <template>
 <div class="modalBackground" @click.self="HideModal">
     <div class="modal" >
+        <b> Input the details of the {{ this.entityToAdd }} you are adding. </b>
         <div class="inputs">
             Name: <input type="string" v-model="nameInput">
             Health: <input type="number" step="1" v-model="healthInput">
             Initative: <input type="number" step="1" v-model="initativeInput">
         </div>
         <div class="buttons">
-            <button @click="AddPlayer"> Add </button>
+            <button @click="AddEntity"> Add </button>
             <button @click="HideModal"> Cancel </button>
         </div>
 
@@ -18,6 +19,7 @@
 <script>
 export default {
     name: 'EntityModal',
+    props: ["entityToAdd"],
     data() {
         return {
             nameInput: null,
@@ -28,13 +30,13 @@ export default {
 
     methods: {
 
-        AddPlayer() {
-            var playerData = {
+        AddEntity() {
+            var entityData = {
                 name: this.nameInput,
                 health: this.healthInput,
                 initative: this.initativeInput,
             }
-            this.$emit('AddPlayer', playerData);
+            this.$emit('AddEntity', this.entityToAdd, entityData);
         },
 
         HideModal() {

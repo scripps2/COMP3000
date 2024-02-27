@@ -4,36 +4,46 @@ Clicking the card will change the DetailsPage to show more details about the NPC
 A button will bring up the ActionResolve menu to allow quickly performing an action.-->
 
 <template>
-  <div class="npccard" @click="npcClick" :class="{ dead: status === 'dead'}">
-    <div class="npcname">
-      {{ name }}
-    </div>
+  <div class="npccard" v-if="entity.display == true || viewHidden == true" :class="{ dead: status === 'dead', hidden: entity.display === false}">
+    <div class="npccardcontent" @click="npcClick">
+      <div class="npcname">
+        {{ index }}: {{ entity.name }}
+      </div>
 
-    <div class="npcstats">
+      <div class="npcstats">
       <div class="npchealth">
         <div v-if="status !== 'dead'">
-            Health points: {{ health }}
+            Health points: {{ entity.health }}/{{ entity.maxhp }}
         </div>
         <div v-if="status === 'dead'">
             Dead
         </div>
       </div>
       <div class="npcinitative">
-        {{ initative }}
+        {{ entity.initative }}
       </div>
-    </div> 
+      </div> 
 
+    </div>
+  
+    <div class="npccardbuttons">
+      <button @click="npcHide"> {{ buttonText }} </button> 
+      <button @click="npcFullHp"> MaxHP </button>
+      <button @click="npcZeroHp"> 0HP </button>
+      <button @click="npcRemove"> Delete </button>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
   name: 'NpcCard',
-  props: ['id', 'name', 'health','initative'],
-  emits: ['entityClicked'],
+  props: ['index', 'entity', 'viewHidden', 'health'],
+    emits: ['entityClicked', 'entityHide', 'entityEditHealth', 'entityRemove'],
   data() {
       return {
-          status: 'alive'
+          status: 'alive',
+          buttonText: 'Hide',
       }
   },
   updated() {
@@ -46,8 +56,26 @@ export default {
   },
   methods: {
     npcClick() {
-      this.$emit('entityClicked', 'npc', this.id)
-    }
+      this.$emit('entityClicked', 'npc', this.index)
+    },
+
+    npcHide() {
+      this.$emit('entityHide', 'npc', this.index)
+      if(this.buttonText == 'Hide') this.buttonText = 'Show';
+      else this.buttonText = 'Hide'
+    },
+
+    npcFullHp() {
+      this.$emit('entityEditHealth', 'npc', this.index, this.entity.maxhp)
+    },
+
+    npcZeroHp() {
+      this.$emit('entityEditHealth', 'npc', this.index, 0)
+    },
+
+    npcRemove() {
+      this.$emit('entityRemove', 'npc', this.index)
+    },
   }
 }
 </script>
@@ -59,13 +87,41 @@ export default {
   background: red;
   margin: auto;
   border-radius: 10px;
-  display: block;
+  display: flex;
   overflow: hidden;
   border-style: solid;
  }
 
  .npccard.dead {
-    background: lightslategrey;
+  background: lightslategrey;
+ }
+
+ .npccard.hidden {
+  opacity: 60%;
+ } 
+
+ .npccardcontent {
+  height: 100%;
+  width: 75%;
+  display: block;
+ }
+
+ .npccardbuttons {
+  height: 100%;
+  width: 25%;
+  display: grid;
+  border-left-style: solid;
+  justify-content: center;
+  align-content: center;
+ }
+
+ .npccardbuttons button {
+  font-size: 75%;
+  display: block;
+  width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  
  }
 
  .npcname {

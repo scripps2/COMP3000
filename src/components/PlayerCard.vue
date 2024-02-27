@@ -4,16 +4,16 @@ Clicking the card will change the DetailsPage to show more details about the pla
 A button will bring up the ActionResolve menu to allow quickly performing an action.-->
 
 <template>
-  <div v-if="display == true || viewHidden == true" class="playercard" :class="{stable: status === 'stable', dying: status === 'dying', dead: status === 'dead', hidden: display === false}">
+  <div class="playercard" v-if="entity.display == true || viewHidden == true" :class="{stable: status === 'stable', dying: status === 'dying', dead: status === 'dead', hidden: entity.display === false}">
     <div class="playercardcontent" @click="playerClick">
       <div class="playername">
-        {{ name }}
+        {{ index }} : {{ entity.name }}
       </div>
 
       <div class="playerstats">
         <div class="playerhealth">
           <div v-if="status === 'alive'">
-            HP: {{ health }}/{{ maxhp }}
+            HP: {{ entity.health }}/{{ entity.maxhp }}
           </div>
           <div v-if="status === 'dying'">
             Death Saves!
@@ -30,7 +30,7 @@ A button will bring up the ActionResolve menu to allow quickly performing an act
           </div>
         </div>
         <div class="playerinitative">
-          {{ initative }}
+          {{ entity.initative }}
         </div>
       </div> 
     </div>
@@ -48,7 +48,7 @@ A button will bring up the ActionResolve menu to allow quickly performing an act
 <script>
 
 export default {
-    props: ['id', 'name', 'maxhp', 'health','initative', 'display', 'viewHidden', 'stats'],
+    props: ['index', 'entity', 'viewHidden'],
     emits: ['entityClicked', 'entityHide', 'entityEditHealth', 'entityRemove'],
     data() {
       return {
@@ -60,36 +60,38 @@ export default {
     },
     updated() {
       if(this.status === 'alive')
-        if(this.health <= 0) {
+        if(this.entity.health <= 0) {
           this.status = 'dying';
         }
       if(this.status === 'dying' || this.status === 'stable')
-        if(this.health > 0) {
+        if(this.entity.health > 0) {
           this.status = 'alive';
+          this.deathsavesSuccess = 0;
+          this.deathsavesFails = 0;
         }
     },
     methods: {
 
       playerClick() {
-        this.$emit('entityClicked', 'player', this.id)
+        this.$emit('entityClicked', 'player', this.index)
       },
 
       playerHide() {
-        this.$emit('entityHide', 'player', this.id)
+        this.$emit('entityHide', 'player', this.index)
         if(this.buttonText == 'Hide') this.buttonText = 'Show';
         else this.buttonText = 'Hide'
       },
 
       playerFullHp() {
-        this.$emit('entityEditHealth', 'player', this.id, this.maxhp)
+        this.$emit('entityEditHealth', 'player', this.index, this.entity.maxhp)
       },
 
       playerZeroHp() {
-        this.$emit('entityEditHealth', 'player', this.id, 0)
+        this.$emit('entityEditHealth', 'player', this.index, 0)
       },
 
       playerRemove() {
-        this.$emit('entityRemove', 'player', this.id)
+        this.$emit('entityRemove', 'player', this.index)
       },
 
       passDeathSave() {
