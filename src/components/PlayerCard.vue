@@ -7,7 +7,7 @@ A button will bring up the ActionResolve menu to allow quickly performing an act
   <div class="playercard" v-if="entity.display == true || viewHidden == true" :class="{stable: status === 'stable', dying: status === 'dying', dead: status === 'dead', hidden: entity.display === false}">
     <div class="playercardcontent" @click="playerClick">
       <div class="playername">
-        {{ index }} : {{ entity.name }}
+        <div class="name"> {{ index }}: {{ entity.name }}</div> <button @click="showoptions = !showoptions"> Options </button>
       </div>
 
       <div class="playerstats">
@@ -35,7 +35,8 @@ A button will bring up the ActionResolve menu to allow quickly performing an act
       </div> 
     </div>
 
-    <div class="playercardbuttons">
+    <div class="playercardbuttons" v-if="showoptions">
+      <div> <button @click="move(1)">up</button><button @click="move(-1)">down</button></div>
       <button @click="playerHide"> {{ buttonText }} </button> 
       <button @click="playerFullHp"> MaxHP </button>
       <button @click="playerZeroHp"> 0HP </button>
@@ -49,13 +50,14 @@ A button will bring up the ActionResolve menu to allow quickly performing an act
 
 export default {
     props: ['index', 'entity', 'viewHidden'],
-    emits: ['entityClicked', 'entityHide', 'entityEditHealth', 'entityRemove'],
+    emits: ['entityClicked', 'moveplayercard', 'entityHide', 'entityEditHealth', 'entityRemove'],
     data() {
       return {
         deathsavesSuccess: 0,
         deathsavesFails: 0,
         status: 'alive',
         buttonText: 'Hide',
+        showoptions: false,
       }
     },
     updated() {
@@ -74,6 +76,10 @@ export default {
 
       playerClick() {
         this.$emit('entityClicked', 'player', this.index)
+      },
+
+      move(direction) {
+        this.$emit("moveplayercard",this.index,direction)
       },
 
       playerHide() {
@@ -146,7 +152,7 @@ export default {
 
  .playercardcontent {
   height: 100%;
-  width: 75%;
+  width: 100%;
   display: block;
  }
 
@@ -177,10 +183,15 @@ export default {
   font-size: 100%;
  }
 
+ .name {
+  width:100%;
+ }
+
  .playerstats {
   height: 75%;
   display: flex;
  }
+
  .playerhealth {
   width: 75%;
   margin: auto;

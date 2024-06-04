@@ -16,11 +16,13 @@
   </div>
   <div class="maincontent">
     <div class="left">
-      <div class="leftheader">
-        Player List <br>
+      <div class="leftheader" @click.self="playerMenu" :class="{showoptions: showplayeroptions}">
+        Player List
+        <div v-if="showplayeroptions">
         <button @click="AddEntityRand('player')">Add Random</button> 
         <button @click="ShowEntityModal('player')">Add Modal</button>
         <button @click="ToggleHiddenView('players')">{{ hiddenButton.players }}</button>
+        </div>
       </div>
       <div class="leftcontent">
         <PlayerCard 
@@ -34,6 +36,7 @@
           @entityHide="entityHide"
           @entityEditHealth="entityEditHealth"
           @entityRemove="entityRemove"
+          @moveplayercard="moveplayercard"
         />       
       </div>
     </div>
@@ -55,11 +58,11 @@
       </div>
     </div>
     <div class="right">
-      <div class="rightheader">
+      <div class="rightheader" @click.self="npcMenu" :class="{showoptions: shownpcoptions}">
         Enemy List <br> 
-        <button @click="AddEntityRand('npc')">Add Random</button> 
-        <button @click="ShowEntityModal('npc')">Add Modal</button>
-        <button @click="ToggleHiddenView('npcs')">{{ hiddenButton.npcs }}</button>
+        <button @click="AddEntityRand('npc')">Add Random</button>  
+        <button @click="ShowEntityModal('npc')">Add Modal</button>  
+        <button @click="ToggleHiddenView('npcs')">{{ hiddenButton.npcs }}</button>  
       </div>
       <div class="rightcontent">
         <NpcCard 
@@ -105,6 +108,9 @@ export default {
       viewHidden: {players: false, npcs: false},
       hiddenButton: {players: 'Show Hidden', npcs: 'Show Hidden'},
       entityToAdd: '',
+      initativesorting: true,
+      showplayeroptions: false,
+      shownpcoptions: false,
     }
   },
   mounted() { 
@@ -234,6 +240,13 @@ export default {
         else this.hiddenButton.npcs = 'Show Hidden' }
     },
 
+    moveplayercard(targetidx, direction) {
+      this.initativesorting = false;
+      var temp = this.players[targetidx];
+      this.players[targetidx] = this.players[targetidx-direction];
+      this.players[targetidx-direction] = temp;
+    },
+
     entityEditHealth(targetType, targetidx, newHealth) {
       // Updating an entity's health value to a new amount, automatically ensuring it doesn't go over or under limits.
       if(targetType === "player") {
@@ -265,11 +278,21 @@ export default {
       this.modalType = '';
     },
 
+    playerMenu() {
+      console.log(this.showplayeroptions);
+      this.showplayeroptions = !this.showplayeroptions
+    },
+
+    npcMenu() {
+      this.shownpcoptions = !this.shownpcoptions
+    }
+
   },
 
   computed: {
     sorted_players() {
-      return this.players.sort((a,b) => {return b.initative - a.initative;});
+      if (this.initativesorting === true) return this.players.sort((a,b) => {return b.initative - a.initative;});
+      else return this.players;
     },
 
     sorted_npcs() {
@@ -289,4 +312,9 @@ export default {
   border-color: #2b3d50;
   margin-top: 0px;
 }
+
+.leftheader.showoptions, .rightheader.showoptions{
+  height: 10%
+}
+
 </style>

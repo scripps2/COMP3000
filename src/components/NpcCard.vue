@@ -7,7 +7,7 @@ A button will bring up the ActionResolve menu to allow quickly performing an act
   <div class="npccard" v-if="entity.display == true || viewHidden == true" :class="{ dead: status === 'dead', hidden: entity.display === false}">
     <div class="npccardcontent" @click="npcClick">
       <div class="npcname">
-        {{ index }}: {{ entity.name }}
+        <div class="name"> {{ index }}: {{ entity.name }}</div> <button @click="showoptions = !showoptions"> Options </button>
       </div>
 
       <div class="npcstats">
@@ -26,7 +26,7 @@ A button will bring up the ActionResolve menu to allow quickly performing an act
 
     </div>
   
-    <div class="npccardbuttons">
+    <div class="npccardbuttons" v-if="showoptions">
       <button @click="npcHide"> {{ buttonText }} </button> 
       <button @click="npcFullHp"> MaxHP </button>
       <button @click="npcZeroHp"> 0HP </button>
@@ -44,6 +44,7 @@ export default {
       return {
           status: 'alive',
           buttonText: 'Hide',
+          showoptions: false
       }
   },
   updated() {
@@ -102,7 +103,7 @@ export default {
 
  .npccardcontent {
   height: 100%;
-  width: 75%;
+  width: 100%;
   display: block;
  }
 
@@ -133,10 +134,15 @@ export default {
   font-size: 100%;
  }
 
+ .name {
+  width:100%;
+ }
+
  .npcstats {
   height: 75%;
   display: flex;
  }
+ 
  .npchealth {
   width: 75%;
   margin: auto;
