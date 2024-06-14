@@ -143,9 +143,9 @@ export default {
       var playerlist;
       if(input === undefined) {
         playerlist = [
-          {name: "Player 1", display: true, maxhp: 12, health: 12, initative: 8, stats:{ strength: 15, dexterity: 13, constitution: 14, intelligence: 8, wisdom: 10, charisma: 12}},
-          {name: "2nd", display: true, maxhp: 8, health: 8, initative: 18, stats: { strength: 8, dexterity: 15, constitution: 10, intelligence: 12, wisdom: 13, charisma: 14}},
-          {name: "Third", display: true, maxhp: 6, health: 6, initative: 12, stats: { strength: 8, dexterity: 12, constitution: 10, intelligence: 15, wisdom: 14, charisma: 13 }},
+          {name: "Player 1", display: true, maxhp: 12, health: 12, initative: 8, armorClass: 13, stats:{ strength: 15, dexterity: 13, constitution: 14, intelligence: 8, wisdom: 10, charisma: 12}},
+          {name: "2nd", display: true, maxhp: 8, health: 8, initative: 18, armorClass: 14, stats: { strength: 8, dexterity: 15, constitution: 10, intelligence: 12, wisdom: 13, charisma: 14}},
+          {name: "Third", display: true, maxhp: 6, health: 6, initative: 12, armorClass: 11, stats: { strength: 8, dexterity: 12, constitution: 10, intelligence: 15, wisdom: 14, charisma: 13 }},
         ]
       }
       else {
@@ -159,8 +159,8 @@ export default {
       var npclist;
       if(input === undefined) {
         npclist = [
-          {name: "Goblin", maxhp: 6, health: 6, initative: 4, display: true, stats: {strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma:10}},
-          {name: "Goblin #2", maxhp: 5, health: 5, initative: 9, display: true, stats: {strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma:10}}
+          {name: "Goblin", display: true, maxhp: 6, health: 6, initative: 4, armorClass: 10, stats: {strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma:10}},
+          {name: "Goblin #2", display: true, maxhp: 5, health: 5, initative: 9, armorClass: 11, stats: {strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma:10}}
         ]
       } else {
         npclist = input;
@@ -177,6 +177,7 @@ export default {
         name: 'placeholder',
         maxhp: generatedHealth,
         health: generatedHealth,
+        armorClass: 10,
         initative: generatedInitative,
         stats: {strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma:10},
         display: true,
@@ -205,6 +206,7 @@ export default {
         name: entityInfo.name,
         maxhp: entityInfo.health,
         health: entityInfo.health,
+        armorClass: entityInfo.ac,
         initative: entityInfo.initative,
         stats: {strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma:10},
         display: true
@@ -241,10 +243,12 @@ export default {
     },
 
     moveplayercard(targetidx, direction) {
-      this.initativesorting = false;
-      var temp = this.players[targetidx];
-      this.players[targetidx] = this.players[targetidx-direction];
-      this.players[targetidx-direction] = temp;
+      if (this.players[targetidx-direction]) { //Check the selected player card isn't the first or last one
+        this.initativesorting = false;
+        var temp = this.players[targetidx];
+        this.players[targetidx] = this.players[targetidx-direction];
+        this.players[targetidx-direction] = temp;
+      }
     },
 
     entityEditHealth(targetType, targetidx, newHealth) {

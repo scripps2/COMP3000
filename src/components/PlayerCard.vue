@@ -10,33 +10,35 @@ A button will bring up the ActionResolve menu to allow quickly performing an act
         <div class="name"> {{ index }}: {{ entity.name }}</div> <button @click="showoptions = !showoptions"> Options </button>
       </div>
 
-      <div class="playerstats">
-        <div class="playerhealth">
-          <div v-if="status === 'alive'">
-            HP: {{ entity.health }}/{{ entity.maxhp }}
+      <div class="playerdetails">
+          <div v-if="status === 'alive'" class="playerhealth">
+            <div class="playerhealthtext"> Health: </div>
+            <div class="healthBarBackground">
+              <div class="healthBarProgress" :style="{width: this.healthPercent+'%'}"> </div>
+              <span>{{ entity.health }}/{{ entity.maxhp }}</span>
+            </div>
           </div>
-          <div v-if="status === 'dying'">
+          <div v-if="status === 'dying'" class="playerhealth">
             Death Saves!
             <br>
             Success = {{ deathsavesSuccess }} <button @click="passDeathSave">Pass</button>
             <br>
             Fails = {{ deathsavesFails }} <button @click="failDeathSave">Fail</button>
           </div>
-          <div v-if="status === 'stable'">
+          <div v-if="status === 'stable'" class="playerhealth">
             stable
           </div>
-          <div v-if="status === 'dead'">
+          <div v-if="status === 'dead'" class="playerhealth">
             dead
           </div>
-        </div>
-        <div class="playerinitative">
-          {{ entity.initative }}
-        </div>
-      </div> 
+        <div class="playerstats">
+          <div class="playerinitative"> Initiative: {{ entity.initative }} </div> <div class="playerac"> AC: {{ entity.armorClass }} </div>
+        </div> 
+      </div>
     </div>
 
     <div class="playercardbuttons" v-if="showoptions">
-      <div> <button @click="move(1)">up</button><button @click="move(-1)">down</button></div>
+      <div style="display: flex"> <button @click="move(1)">+</button><button @click="move(-1)">-</button></div>
       <button @click="playerHide"> {{ buttonText }} </button> 
       <button @click="playerFullHp"> MaxHP </button>
       <button @click="playerZeroHp"> 0HP </button>
@@ -60,17 +62,26 @@ export default {
         showoptions: false,
       }
     },
+    computed: {
+      healthPercent() {
+        return Math.floor(100*this.entity.health/this.entity.maxhp);
+      }
+    },
     updated() {
-      if(this.status === 'alive')
-        if(this.entity.health <= 0) {
-          this.status = 'dying';
-        }
+
       if(this.status === 'dying' || this.status === 'stable')
         if(this.entity.health > 0) {
           this.status = 'alive';
           this.deathsavesSuccess = 0;
           this.deathsavesFails = 0;
         }
+
+      if(this.status === 'alive') {
+        if(this.entity.health <= 0) {
+          this.status = 'dying';
+        }
+        
+      }
     },
     methods: {
 
@@ -187,21 +198,77 @@ export default {
   width:100%;
  }
 
- .playerstats {
+ .playerdetails {
   height: 75%;
-  display: flex;
+  width: 100%;
+  display:block;
  }
 
  .playerhealth {
+  width: 100%;
+  height: 50%;
+  justify-content: center;
+  align-items: center;
+  display:flex;
+  border-bottom-style:solid;
+ }
+
+ .playerhealthtext {
+  text-align: center;
+  margin:auto;
+ }
+
+ .healthBarBackground {
   width: 75%;
-  margin: auto;
+  height: 20px;
+  background: red;
+  position:relative;
+  margin:auto;
+  border-radius:20px;
+  overflow:hidden;
+  border-style:solid;
+  border-color:black;
+ }
+
+ .healthBarBackground span{
+  position: absolute;
+  left:0;
+  right:0;
+  top:0;
+  bottom:0;
+  margin:auto;
+  color:white;
+  align-content:center;
+  text-shadow:1pt;
+ }
+
+ .healthBarProgress {
+  height: 100%;
+  width: 50%;
+  background: green;
+  position: relative;
+ }
+
+ .playerstats {
+  width: 100%;
+  height: 50%;
+  align-items:center;
+  display:flex;
+ }
+
+ .playerac {
+  width: 50%;
+  height: 100%;
+  border-left-style: solid;
+  text-align: center;
+  align-content: center;
  }
 
  .playerinitative {
-  border-left-style: solid;
-  width: 25%;
-  display: grid;
-  align-items:center;
+  width: 50%;
+  height: 100%;
+  text-align: center;
+  align-content: center;
  }
  
 </style>

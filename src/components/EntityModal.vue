@@ -4,9 +4,11 @@
         <b> Input the details of the {{ this.entityToAdd }} you are adding. </b>
         <div class="inputs">
             Name: <input type="string" v-model="nameInput">
-            Health: <input type="number" step="1" v-model="healthInput">
+            Max HP: <input type="number" step="1" v-model="healthInput">
+            AC: <input type="number" step="1" v-model="acInput">
             Initative: <input type="number" step="1" v-model="initativeInput">
         </div>
+        <br>
         <div class="buttons">
             <button @click="AddEntity"> Add </button>
             <button @click="HideModal"> Cancel </button>
@@ -25,15 +27,16 @@ export default {
             nameInput: null,
             healthInput: null,
             initativeInput: null,
+            acInput: null,
         }
     },
 
     methods: {
-
         AddEntity() {
             var entityData = {
                 name: this.nameInput,
                 health: this.healthInput,
+                ac: this.acInput,
                 initative: this.initativeInput,
             }
             this.$emit('AddEntity', this.entityToAdd, entityData);
@@ -53,7 +56,9 @@ export default {
  .inputs {
     display: grid;
     grid-template-columns: 25% 75%;
+    row-gap: 5px;
     justify-content: left;
+    text-align:left;
     flex-direction: column; 
     height: 100%;
     width: 100%;

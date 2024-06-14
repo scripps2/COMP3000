@@ -10,20 +10,21 @@ A button will bring up the ActionResolve menu to allow quickly performing an act
         <div class="name"> {{ index }}: {{ entity.name }}</div> <button @click="showoptions = !showoptions"> Options </button>
       </div>
 
-      <div class="npcstats">
-      <div class="npchealth">
-        <div v-if="status !== 'dead'">
-            Health points: {{ entity.health }}/{{ entity.maxhp }}
-        </div>
-        <div v-if="status === 'dead'">
-            Dead
-        </div>
+      <div class="npcdetails">
+          <div v-if="status === 'alive'" class="npchealth">
+            <div class="npchealthtext"> Health: </div>
+            <div class="healthBarBackground">
+              <div class="healthBarProgress" :style="{width: this.healthPercent+'%'}"> </div>
+              <span>{{ entity.health }}/{{ entity.maxhp }}</span>
+            </div>
+          </div>
+          <div v-if="status === 'dead'" class="npchealth">
+            dead
+          </div>
+        <div class="npcstats">
+          <div class="npcinitative"> Initiative: {{ entity.initative }} </div> <div class="npcac"> AC: {{ entity.armorClass }} </div>
+        </div> 
       </div>
-      <div class="npcinitative">
-        {{ entity.initative }}
-      </div>
-      </div> 
-
     </div>
   
     <div class="npccardbuttons" v-if="showoptions">
@@ -55,6 +56,13 @@ export default {
           this.status = 'alive'
       }
   },
+
+  computed: {
+    healthPercent() {
+      return Math.floor(100*this.entity.health/this.entity.maxhp);
+    }
+  },  
+  
   methods: {
     npcClick() {
       this.$emit('entityClicked', 'npc', this.index)
@@ -85,7 +93,7 @@ export default {
  .npccard {
   width: 90%;
   height: 100px;
-  background: red;
+  background: rgb(255, 90, 90);
   margin: auto;
   border-radius: 10px;
   display: flex;
@@ -138,20 +146,77 @@ export default {
   width:100%;
  }
 
- .npcstats {
+ .npcdetails {
   height: 75%;
-  display: flex;
+  width: 100%;
+  display: block;
  }
  
  .npchealth {
+  width: 100%;
+  height: 50%;
+  justify-content: center;
+  align-items: center;
+  display:flex;
+  border-bottom-style:solid;
+ }
+
+ .npchealthtext {
+  text-align: center;
+  margin:auto;
+ }
+
+ .healthBarBackground {
   width: 75%;
-  margin: auto;
+  height: 20px;
+  background: red;
+  position:relative;
+  margin:auto;
+  border-radius:20px;
+  overflow:hidden;
+  border-style:solid;
+  border-color:black;
+ }
+
+ .healthBarBackground span{
+  position: absolute;
+  left:0;
+  right:0;
+  top:0;
+  bottom:0;
+  margin:auto;
+  color:white;
+  align-content:center;
+  text-shadow:1pt;
+ }
+
+ .healthBarProgress {
+  height: 100%;
+  width: 50%;
+  background: green;
+  position: relative;
+ }
+
+
+ .npcstats {
+  width: 100%;
+  height: 50%;
+  align-items:center;
+  display:flex;
+ }
+
+ .npcac {
+  width: 50%;
+  height: 100%;
+  border-left-style: solid;
+  text-align: center;
+  align-content: center;
  }
 
  .npcinitative {
-  border-left-style: solid;
-  width: 25%;
-  display: grid;
-  align-items:center;
+  width: 50%;
+  height: 100%;
+  text-align: center;
+  align-content: center;
  }
 </style>
