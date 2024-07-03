@@ -12,57 +12,44 @@
         <button @click="detailsChangeTab('spells')"> Spells </button>
     </div>
     <div class="detailscontent">
-        <div v-if="currenttab === 'main'" class="detailsmain">
-        <div class="detailshealth">
-            <b> Health: {{ entity.health }}/{{ entity.maxhp }} </b>
-            <div class="detailshealthinput">
-                <button @click="healthChange(-1)">-</button><input type="number" step="1" v-model="healthinput" placeholder='Enter value'><button @click="healthChange(1)">+</button>
-            </div>
-        </div>
-        <div class="detailsinitative">
-            Initative: {{ entity.initative }}
-        </div>
-        
-        </div>
-        <div v-if="currenttab === 'stats'" class="stats">
-        <br> 
-        Strength: {{ entity.stats.strength }} - Bonus: {{ Math.floor(( entity.stats.strength - 10)/2) }}  <br>
-        Dexterity: {{ entity.stats.dexterity }} - Bonus: {{ Math.floor(( entity.stats.dexterity - 10)/2) }}  <br> 
-        Constitution: {{ entity.stats.constitution }} - Bonus: {{ Math.floor(( entity.stats.constitution - 10)/2) }} <br>
-        Intelligence: {{ entity.stats.intelligence }} - Bonus: {{ Math.floor(( entity.stats.intelligence - 10)/2) }} <br> 
-        Wisdom: {{ entity.stats.wisdom }} - Bonus: {{ Math.floor(( entity.stats.wisdom - 10)/2) }} <br> 
-        Charisma: {{ entity.stats.charisma }} - Bonus: {{ Math.floor(( entity.stats.charisma - 10)/2) }} <br> 
-        </div>
-        <div v-if="currenttab === 'attacks'" class="attacks">
-            <!-- Some sort of table system here -->
-            Name of Attack - To-Hit Modifier - Damage - Extra details
-            <br>
-            Unarmed attack  To-hit: {{ Math.floor((entity.stats.strength-10)/2) +2 }} - Damage: {{ 1 + Math.floor((entity.stats.strength-10)/2)}}
-        </div>
-        <div v-if="currenttab === 'spells'" class="spells">
-            <!-- Some sort of table system here -->
-            Name of Spell - To-Hit or Save to roll - Damage - Extra Details
-            <br>
-            <!-- To hit can change between classes.  Maybe each character carries a "class" object that includes
-                their class name and level as well as information like their spellcasting ability, spell slots, etc -->
-            Fire Bolt - To-hit: {{ Math.floor((entity.stats.intelligence-10)/2) + 2 }} - Damage: 1d8 Fire - 120ft Range
-        </div> 
+
+        <Main v-if="currenttab === 'main'"
+        :entityIndex = "entityIndex"
+        :entity = "entity"
+        :entityType = "entityType"
+        @entityEditHealth = "entityEditHealth"/>
+
+        <Stats v-if="currenttab === 'stats'"
+        :entity = "entity" />
+
+        <Attacks v-if="currenttab === 'attacks'"
+        :entity = "entity" />
+
+        <Spells v-if="currenttab === 'spells'"
+        :entity = "entity" />
+
     </div>
 </template>
 
 <script>
+
+import Main from './DetailsPage/Main.vue'
+import Stats from './DetailsPage/Stats.vue'
+import Attacks from './DetailsPage/Attacks.vue'
+import Spells from './DetailsPage/Spells.vue'
+
 export default {
+    name: 'DetailsPage',
+    components: { Main, Stats, Attacks, Spells },
     props: ["entityIndex", "entity", "entityType"],
     emits: ["entityEditHealth"],
     data() {
         return {
-            healthinput: null,
             currenttab: 'main',
         }
     },
     methods: {
-        healthChange(mult) {
-            var newHealth = this.entity.health + Math.floor(this.healthinput) * mult;
+        entityEditHealth(newHealth) {
             this.$emit('entityEditHealth', this.entityType, this.entityIndex, newHealth)
         },
 
@@ -82,7 +69,7 @@ export default {
         line-height: 5vh;
         background: rgba(255,0,0,0.25);
         color: red;
-        border-color: #2c3e50;
+        border-color: black;
     }
 
     .detailsname.isplayer {
@@ -99,31 +86,4 @@ export default {
         width: 100%;
         /*padding-top: 10px; - Want to have a margin before but have the border go all the way up */
     }
-    .detailsmain {
-        display: flex;
-        overflow: hidden;
-        border-bottom-style: solid;
-    }
-
-    .detailshealth {
-        padding: 1% 0%;
-        width: 75%;
-        display: grid;
-        align-items: center;
-    }
-
-    .detailshealthinput {
-        display: flex;
-        width: 100%;
-        justify-content: center;
-    }
-
-    .detailsinitative {
-        border-left-style: solid;
-        padding: 1% 0%;
-        width: 25%;
-        display: grid;
-        align-items:center;
-    }
-
 </style>

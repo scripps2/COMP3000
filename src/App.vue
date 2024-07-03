@@ -312,8 +312,8 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-  border-color: #2b3d50;
+  color: black;
+  border-color: black;
   margin-top: 0px;
 }
 
