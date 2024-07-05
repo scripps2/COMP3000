@@ -17,6 +17,7 @@
 export default {
     name: 'EntityDeleteModal',
     props: ['entity', 'entityType', 'index'],
+    emits: ["ConfirmRemove", "HideModal"],
     data() {
         return {
 

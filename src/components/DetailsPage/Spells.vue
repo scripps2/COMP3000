@@ -1,4 +1,5 @@
 <template>
+    <br>
     <!-- Some sort of table system here -->
     Name of Spell - To-Hit or Save to roll - Damage - Extra Details
     <br>

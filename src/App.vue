@@ -4,7 +4,7 @@
     Name of Encounter
   </div>
   <div class="modalDisplay" v-if="displayModal === true">
-    <EntityModal v-if="modalType === 'addEntity'"
+    <EntityAddModal v-if="modalType === 'addEntity'"
     :entityToAdd="entityToAdd"
     @HideModal="HideModal"
     @AddEntity="AddEntity" />
@@ -12,7 +12,14 @@
     <EntityDeleteModal v-if="modalType === 'removeEntity'" 
     :entity="selectedEntity"
     @HideModal="HideModal"
-    @ConfirmRemove="ConfirmRemove"/>
+    @ConfirmRemove="ConfirmRemove" />
+
+    <EntityAttackModal v-if="modalType === 'entityAttacking'"
+    :entity="selectedEntity"
+    :npcs="npcs"
+    @HideModal="HideModal"
+    @ConfirmAttack="ConfirmAttack" />
+
   </div>
   <div class="maincontent">
     <div class="left">
@@ -49,7 +56,9 @@
           :entityIndex="selectedEntityIndex" 
           :entity="selectedEntity" 
           :entityType="selectedEntityType" 
-          @entityEditHealth="entityEditHealth"/>
+          @entityEditHealth="entityEditHealth"
+          @entityAttacking="entityAttacking"
+          @entityEditStats="entityEditStats"/>
         <div v-if="!showInfo">
           <br>
           Click a player or NPC to be able to <br>
@@ -87,12 +96,13 @@
 import PlayerCard from './components/PlayerCard.vue'
 import DetailsPage from './components/DetailsPage.vue'
 import NpcCard from './components/NpcCard.vue'
-import EntityModal from './components/EntityModal.vue'
-import EntityDeleteModal from './components/EntityDeleteModal.vue'
+import EntityAddModal from './components/Modals/EntityAddModal.vue'
+import EntityDeleteModal from './components/Modals/EntityDeleteModal.vue'
+import EntityAttackModal from './components/Modals/EntityAttackModal.vue'
 
 export default {
   name: 'App',
-  components: { PlayerCard, DetailsPage, NpcCard, EntityModal, EntityDeleteModal },
+  components: { PlayerCard, DetailsPage, NpcCard, EntityAddModal, EntityDeleteModal, EntityAttackModal },
   data() {
     return {
       players: this.GetPlayers(),
@@ -263,6 +273,23 @@ export default {
       }
     },
 
+    entityAttacking() {
+      /* Trigger a modal on who the target will be */
+      this.displayModal = true;
+      this.modalType = "entityAttacking";
+    },
+
+    ConfirmAttack(attackTarget, damageRoll) {
+      Math.max(Math.min(this.npcs[attackTarget].health -= damageRoll,this.npcs[attackTarget].maxhp),0);
+      this.displayModal = false;
+      this.modalType = '';
+    },
+
+    entityEditStats(entityType, entityIndex, newstats) {
+      if(entityType === "player") this.players[entityIndex].stats = newstats;
+      else if(entityType === "npc") this.npcs[entityIndex].stats = newstats;
+    },
+
     entityRemove(targetType, targetidx) {
       this.deleteIndex = targetidx;
       if (targetType === 'player') { this.selectedEntity = this.players[targetidx]; this.entityType = 'player'; this.displayModal = true; this.modalType = 'removeEntity'; }
@@ -283,7 +310,6 @@ export default {
     },
 
     playerMenu() {
-      console.log(this.showplayeroptions);
       this.showplayeroptions = !this.showplayeroptions
     },
 

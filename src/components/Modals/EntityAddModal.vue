@@ -22,6 +22,7 @@
 export default {
     name: 'EntityModal',
     props: ["entityToAdd"],
+    emits: ["AddEntity","HideModal"],
     data() {
         return {
             nameInput: null,

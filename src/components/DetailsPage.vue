@@ -17,13 +17,16 @@
         :entityIndex = "entityIndex"
         :entity = "entity"
         :entityType = "entityType"
-        @entityEditHealth = "entityEditHealth"/>
+        @entityEditHealth = "entityEditHealth" />
 
         <Stats v-if="currenttab === 'stats'"
-        :entity = "entity" />
+        :entity = "entity" 
+        :entityindex="entityIndex"
+        @EditStats = "entityEditStats"/>
 
         <Attacks v-if="currenttab === 'attacks'"
-        :entity = "entity" />
+        :entity = "entity" 
+        @entityAttacking = "entityAttacking" />
 
         <Spells v-if="currenttab === 'spells'"
         :entity = "entity" />
@@ -42,7 +45,7 @@ export default {
     name: 'DetailsPage',
     components: { Main, Stats, Attacks, Spells },
     props: ["entityIndex", "entity", "entityType"],
-    emits: ["entityEditHealth"],
+    emits: ["entityEditHealth", "entityAttacking", "entityEditStats"],
     data() {
         return {
             currenttab: 'main',
@@ -55,6 +58,15 @@ export default {
 
         detailsChangeTab(tabInput) {
             this.currenttab = tabInput;
+        },
+
+        entityAttacking() {
+            /*this.$emit("playerAttacking", this.entityType, this.entityIndex, attackInfo);*/
+            this.$emit("entityAttacking");
+        },
+
+        entityEditStats(newstats) {
+            this.$emit("entityEditStats", this.entityType, this.entityIndex, newstats)
         }
     }
 }
