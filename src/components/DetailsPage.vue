@@ -60,9 +60,8 @@ export default {
             this.currenttab = tabInput;
         },
 
-        entityAttacking() {
-            /*this.$emit("playerAttacking", this.entityType, this.entityIndex, attackInfo);*/
-            this.$emit("entityAttacking");
+        entityAttacking(attackInfo) {
+            this.$emit("entityAttacking", attackInfo);
         },
 
         entityEditStats(newstats) {

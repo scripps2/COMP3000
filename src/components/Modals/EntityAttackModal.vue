@@ -30,7 +30,7 @@
 <script>
 export default {
     name: 'EntityAttackModal',
-    props: ["entity", "npcs"],
+    props: ["entity", "npcs", "attackDetails"],
     emits: ["ConfirmAttack", "HideModal"],
     data() {
         return {
@@ -44,21 +44,10 @@ export default {
         }
     },
 
-    // updated() {
-    //     if(Math.floor(this.attackTarget) < this.npcs.length) {
-    //         this.selectedTarget = this.npcs[Math.floor(this.attackTarget)].name;
-    //         this.selectedTargetAC = this.npcs[Math.floor(this.attackTarget)].armorClass;
-    //     }
-    //     else {
-    //         this.selectedTarget = "Invalid Entry";
-    //         this.selectedTargetAC = 0;
-    //     }
-    // },
-
     mounted() {
-        this.tohitRoll = Math.floor(Math.random()*20)+1 + Math.floor((this.entity.stats.strength-10)/2);
-        this.damageRoll = Math.max(1,1+Math.floor((this.entity.stats.strength-10)/2));
-        this.damageType = "Bludgeoning";
+        this.RollToHit();
+        this.RollDamage();
+        this.damageType = this.attackDetails.damageType;
     },
 
     methods: {
@@ -84,6 +73,42 @@ export default {
             this.$emit('HideModal');
         },
 
+        RollToHit() {
+            /* 
+            mainStat and tohitBonus both add a flat amount to the roll. 
+                (mainStat is the stat used for the attack, tohitBonus is used for magic weapons)
+            */
+
+            let diceroll = Math.floor(Math.random()*20)+1;
+            let mainStatBonus = Math.floor((this.entity.stats[this.attackDetails.mainStat]-10)/2);
+            this.tohitRoll =  diceroll + mainStatBonus + this.attackDetails.tohitBonus;
+        },
+
+        RollDamage() {
+            /* 
+            mainStat will add a flat amount of damage
+            damageRoll will be either nothing, or a dictionary of dice rolls that need to be made.
+            damageBonus is a flat amount added at the end, mostly from magical weapons.
+            */
+
+            let mainstatBonus = Math.floor((this.entity.stats[this.attackDetails.mainStat]-10)/2);
+            let diceroll;
+            if(this.attackDetails.damageRoll == 0) diceroll = 0;
+            else {
+                /*let runningtotal = 0;
+                let damageRollLocal = this.attackDetails.damageRoll;
+                let possibleRolls = ["d4", "d6", "d8", "d10", "d12", "d20"];
+                for(const dice in possibleRolls) {
+                    for(i=0;i<damageRollLocal[possibleRolls];i++) {
+
+                    }
+                }*/
+                console.log("Attack requires dice rolls, to be done");
+                diceroll = 0;
+            }
+
+            this.damageRoll = diceroll + mainstatBonus + this.attackDetails.damageBonus;
+        },
 
     }
 }

@@ -16,6 +16,7 @@
 
     <EntityAttackModal v-if="modalType === 'entityAttacking'"
     :entity="selectedEntity"
+    :attackDetails="attackDetails"
     :npcs="npcs"
     @HideModal="HideModal"
     @ConfirmAttack="ConfirmAttack" />
@@ -121,6 +122,7 @@ export default {
       initativesorting: true,
       showplayeroptions: false,
       shownpcoptions: false,
+      attackDetails: {mainStat: "", tohitBonus: 0, damageRoll: "", damageBonus: 0, damageType: ""},
     }
   },
   mounted() { 
@@ -273,10 +275,11 @@ export default {
       }
     },
 
-    entityAttacking() {
+    entityAttacking(attackInfo) {
       /* Trigger a modal on who the target will be */
       this.displayModal = true;
       this.modalType = "entityAttacking";
+      this.attackDetails = attackInfo;
     },
 
     ConfirmAttack(attackTarget, damageRoll) {
